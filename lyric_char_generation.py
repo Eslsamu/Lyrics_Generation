@@ -12,19 +12,19 @@ import os
 import string
 import re
 import numpy as np
-from google.colab import drive
+#from google.colab import drive
 
-drive.mount('/content/gdrive')
+#drive.mount('/content/gdrive')
 
-!git clone https://github.com/davordavidovic/NLP-lyrics-generator.git
+#!git clone https://github.com/davordavidovic/NLP-lyrics-generator.git
   
 #!sudo pip install h5py
 
 def load_songs(genre, max_tokens):
-    df1 = pd.read_csv('./NLP-lyrics-generator/data/lyrics_part1.csv')
-    df2 = pd.read_csv('./NLP-lyrics-generator/data/lyrics_part2.csv')
-    df3 = pd.read_csv('./NLP-lyrics-generator/data/lyrics_part3.csv')
-    df4 = pd.read_csv('./NLP-lyrics-generator/data/lyrics_part4.csv')
+    df1 = pd.read_csv('data/lyrics_part1.csv')
+    df2 = pd.read_csv('data/lyrics_part2.csv')
+    df3 = pd.read_csv('data/lyrics_part3.csv')
+    df4 = pd.read_csv('data/lyrics_part4.csv')
 
     df_part_1 = pd.concat([df1, df2])
     df_part_2 = pd.concat([df3, df4])
@@ -176,7 +176,7 @@ def run_experiment(n_sequences, n_epochs, genre, seq_len, n_layers, directory):
     checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='min')
 
     #early stopping 
-    es = EarlyStopping(monitor='val_acc', mode='min', verbose=1, patience=100)
+    es = EarlyStopping(monitor='val_acc', mode='min', verbose=1, patience=50)
 
     callbacks_list = [es]
 
@@ -191,7 +191,7 @@ def run_experiment(n_sequences, n_epochs, genre, seq_len, n_layers, directory):
         pickle.dump(history.history, file_pi)
 
     #generate validation texts and training texts
-    val_chars = seq_chars[-5]
+    val_chars = seq_chars[-5:]
     for t in val_chars:
         sentence = "".join(t[0])
         label = t[1]
@@ -204,7 +204,7 @@ def run_experiment(n_sequences, n_epochs, genre, seq_len, n_layers, directory):
   
   
     #TODO save plot on training curve
-    plt.plot(history.history['acc'])
+    plt.plot(history.history['categorical_accuracy'])
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
@@ -212,14 +212,14 @@ def run_experiment(n_sequences, n_epochs, genre, seq_len, n_layers, directory):
     plot_path = directory + "plot.png"
     plt.savefig(plot_path, bbox_inches='tight', format='png')
 
-data_sizes = [10000, 100000, 500000] #num of sequences
+data_sizes = [10000, 100000, 250000] #num of sequences
 epochs = [5,100]
 genres = ['Pop', 'Hip-Hop', 'Metal', 'Country']
-seq_lens = [5,20,50]
+seq_lens = [5,20,30]
 layers = [4, 8] #400 units each
 
 experiments = []
-
+''' 
 #big dataset on all genres with different vocabulary sizes
 for s in seq_lens:
     exp = {"seqs" : data_sizes[0],
@@ -230,7 +230,18 @@ for s in seq_lens:
            "dir" : "./gdrive/My Drive/Colab Notebooks/exps3/_slen" +  str(s)
           }
     experiments.append(exp)
-
+'''
+#big dataset on all genres with different vocabulary sizes
+for g in genres:
+    exp = {"seqs" : data_sizes[2],
+           "epochs" : epochs[1],
+           "genre" : g,
+           "seq_lens" : seq_lens[2],
+           "layers" : layers[0],
+           "dir" : "exps3/_250000_100e_30seq_" +  g
+          }
+    experiments.append(exp)
+  
 print("Running", len(experiments), "experiments")
             
 for e in experiments:
