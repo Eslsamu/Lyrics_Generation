@@ -59,10 +59,10 @@ def prepare_text(text):
 
     for index, word in enumerate(text):
         #remove non alphabetic characters at the end or beginning of a word
-        word = word.strip(string.punctuation)
+        
     
         #replace non alhpanumeric chars with space
-        word = re.sub(r"[\W]",' ',word)
+        word = re.sub(r"[\W]",'',word)
         text[index] = word 
    
     #concatenate again
@@ -213,7 +213,7 @@ def run_experiment(n_sequences, n_epochs, genre, seq_len, n_layers, directory):
     plt.savefig(plot_path, bbox_inches='tight', format='png')
 
 data_sizes = [10000, 100000, 250000] #num of sequences
-epochs = [5,100]
+epochs = [5,50]
 genres = ['Pop', 'Hip-Hop', 'Metal', 'Country']
 seq_lens = [5,20,30]
 layers = [4, 8] #400 units each
